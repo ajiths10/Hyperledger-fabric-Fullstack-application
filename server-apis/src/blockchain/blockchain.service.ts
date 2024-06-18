@@ -26,7 +26,8 @@ export class BlockchainService {
   tlsCertPath: string;
   peerEndpoint: string;
   peerHostAlias: string;
-  Contract: any;
+  Contract: Contract;
+  assetId: string;
 
   constructor() {
     this.channelName = "mychannel";
@@ -87,7 +88,7 @@ export class BlockchainService {
     );
 
     const utf8Decoder = new TextDecoder();
-    const assetId = `asset${Date.now()}`;
+    this.assetId = `asset1718699601354`;
 
     /**
      * displayInputParameters() will print the global scope parameters used by the main driver routine.
@@ -144,8 +145,27 @@ export class BlockchainService {
     }
   }
 
-  create(createBlockchainDto: CreateBlockchainDto) {
-    return "This action adds a new blockchain";
+  /**
+   * Submit a transaction synchronously, blocking until it has been committed to the ledger.
+   */
+  async create(createBlockchainDto: CreateBlockchainDto) {
+    console.log(
+      "\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments"
+    );
+    // const assetId = `asset${Date.now()}`;
+
+    await this.Contract.submitTransaction(
+      "CreateAsset",
+      this.assetId,
+      createBlockchainDto.Color,
+      createBlockchainDto.Size,
+      createBlockchainDto.Owner,
+      createBlockchainDto.AppraisedValue
+    );
+
+    // console.log("*** Transaction committed successfully");
+
+    return "*** Transaction committed successfully";
   }
 
   async findAll() {
@@ -153,8 +173,21 @@ export class BlockchainService {
     return data;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} blockchain`;
+  async findOne(assetId: string) {
+    console.log(
+      "\n--> Evaluate Transaction: ReadAsset, function returns asset attributes"
+    );
+
+    const resultBytes = await this.Contract.evaluateTransaction(
+      "ReadAsset",
+      assetId
+    );
+    const utf8Decoder = new TextDecoder();
+    const resultJson = utf8Decoder.decode(resultBytes);
+    const result = JSON.parse(resultJson);
+    console.log("*** Result:", result);
+
+    return result;
   }
 
   update(id: number, updateBlockchainDto: UpdateBlockchainDto) {
