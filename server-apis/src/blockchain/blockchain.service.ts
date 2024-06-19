@@ -14,6 +14,7 @@ import * as crypto from "crypto";
 import { promises as fs } from "fs";
 import * as path from "path";
 import { TextDecoder } from "util";
+import { UpdateAssetOwnerBlockchainDto } from "./dto/update-asset-owner-blockchain.dto";
 
 @Injectable()
 export class BlockchainService {
@@ -27,7 +28,6 @@ export class BlockchainService {
   peerEndpoint: string;
   peerHostAlias: string;
   Contract: Contract;
-  assetId: string;
 
   constructor() {
     this.channelName = "mychannel";
@@ -86,9 +86,6 @@ export class BlockchainService {
       "PEER_HOST_ALIAS",
       "peer0.org1.example.com"
     );
-
-    const utf8Decoder = new TextDecoder();
-    this.assetId = `asset1718699601354`;
 
     /**
      * displayInputParameters() will print the global scope parameters used by the main driver routine.
@@ -152,27 +149,34 @@ export class BlockchainService {
     console.log(
       "\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments"
     );
-    // const assetId = `asset${Date.now()}`;
+    const assetId = `asset${Date.now()}`;
 
-    await this.Contract.submitTransaction(
-      "CreateAsset",
-      this.assetId,
-      createBlockchainDto.Color,
-      createBlockchainDto.Size,
-      createBlockchainDto.Owner,
-      createBlockchainDto.AppraisedValue
-    );
-
-    // console.log("*** Transaction committed successfully");
+    try {
+      // Create a new asset on the ledger.
+      await this.Contract.submitTransaction(
+        "CreateAsset",
+        assetId,
+        createBlockchainDto.Color,
+        createBlockchainDto.Size,
+        createBlockchainDto.Owner,
+        createBlockchainDto.AppraisedValue
+      );
+    } catch (error) {
+      console.error("******** FAILED to run the application:", error);
+      return error;
+      //  process.exitCode = 1;
+    }
 
     return "*** Transaction committed successfully";
   }
 
+  // Return all the current assets on the ledger.
   async findAll() {
     let data = await this.getAllAssets(this.Contract);
     return data;
   }
 
+  // Get the asset details by assetID.
   async findOne(assetId: string) {
     console.log(
       "\n--> Evaluate Transaction: ReadAsset, function returns asset attributes"
@@ -198,6 +202,18 @@ export class BlockchainService {
     return `This action removes a #${id} blockchain`;
   }
 
+  // Update an existing asset owner asynchronously.
+  async updateAssetOwner(
+    assetId: string,
+    payload: UpdateAssetOwnerBlockchainDto
+  ) {
+    let res = await this.transferAssetAsync(this.Contract, assetId, "Ajith");
+    return {
+      message: `This action updates a #${assetId} blockchain`,
+      data: res,
+    };
+  }
+
   /**
    * Evaluate a transaction to query ledger state.
    */
@@ -212,6 +228,54 @@ export class BlockchainService {
     const result = JSON.parse(resultJson);
     console.log("*** Result:", result);
     return result;
+  }
+
+  /**
+   * This type of transaction would typically only be run once by an application the first time it was started after its
+   * initial deployment. A new version of the chaincode deployed later would likely not need to run an "init" function.
+   */
+  async initLedger(): Promise<Uint8Array> {
+    console.log(
+      "\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger"
+    );
+    // Initialize a set of asset data on the ledger using the chaincode 'InitLedger' function.
+    let res = await this.Contract.submitTransaction("InitLedger");
+    console.log("*** Transaction committed successfully");
+    return res;
+  }
+
+  /**
+   * Submit transaction asynchronously, allowing the application to process the smart contract response (e.g. update a UI)
+   * while waiting for the commit notification.
+   */
+  async transferAssetAsync(
+    contract: Contract,
+    assetId: string,
+    newOwnerName: string
+  ): Promise<void> {
+    console.log(
+      "\n--> Async Submit Transaction: TransferAsset, updates existing asset owner"
+    );
+
+    const commit = await contract.submitAsync("TransferAsset", {
+      arguments: [assetId, newOwnerName],
+    });
+    const utf8Decoder = new TextDecoder();
+    const oldOwner = utf8Decoder.decode(commit.getResult());
+
+    console.log(
+      `*** Successfully submitted transaction to transfer ownership from ${oldOwner} to Saptha`
+    );
+    console.log("*** Waiting for transaction commit");
+
+    const status = await commit.getStatus();
+    if (!status.successful) {
+      throw new Error(
+        `Transaction ${status.transactionId} failed to commit with status code ${status.code}`
+      );
+    }
+
+    console.log("*** Transaction committed successfully");
   }
 
   async newGrpcConnection(): Promise<grpc.Client> {
