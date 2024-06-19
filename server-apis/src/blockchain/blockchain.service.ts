@@ -154,7 +154,7 @@ export class BlockchainService {
     try {
       // Create a new asset on the ledger.
       await this.Contract.submitTransaction(
-        "CreateAsset",
+        "CreateAsset", // Smart Contract/Chain code Ref
         assetId,
         createBlockchainDto.Color,
         createBlockchainDto.Size,
@@ -176,30 +176,88 @@ export class BlockchainService {
     return data;
   }
 
+  // Return all the current assets on the ledger.
+  async findAssetHistory(assetID: string) {
+    let data = await this.getassetHistory(this.Contract, assetID);
+    return data;
+  }
+
   // Get the asset details by assetID.
   async findOne(assetId: string) {
-    console.log(
-      "\n--> Evaluate Transaction: ReadAsset, function returns asset attributes"
-    );
+    try {
+      console.log(
+        "\n--> Evaluate Transaction: ReadAsset, function returns asset attributes"
+      );
 
-    const resultBytes = await this.Contract.evaluateTransaction(
-      "ReadAsset",
-      assetId
-    );
-    const utf8Decoder = new TextDecoder();
-    const resultJson = utf8Decoder.decode(resultBytes);
-    const result = JSON.parse(resultJson);
-    console.log("*** Result:", result);
+      const resultBytes = await this.Contract.evaluateTransaction(
+        "ReadAsset", // Smart Contract/Chain code Ref
+        assetId
+      );
+      const utf8Decoder = new TextDecoder();
+      const resultJson = utf8Decoder.decode(resultBytes);
+      const result = JSON.parse(resultJson);
+      console.log("*** Result:", result);
 
-    return result;
+      return {
+        message: `This action Returns asset - #${assetId} `,
+        data: result,
+      };
+    } catch (error) {
+      return {
+        message: `******** FAILED to return an error`,
+        data: error,
+      };
+    }
   }
 
-  update(id: number, updateBlockchainDto: UpdateBlockchainDto) {
-    return `This action updates a #${id} blockchain`;
+  /**
+   * Submit a transaction synchronously, blocking until it has been committed to the ledger.
+   * Update asset on the ledger.
+   */
+  async update(assetId: string, updateBlockchainDto: UpdateBlockchainDto) {
+    try {
+      let res = await this.Contract.submitTransaction(
+        "UpdateAsset", // Smart Contract/Chain code Ref
+        assetId,
+        updateBlockchainDto.Color,
+        updateBlockchainDto.Size,
+        updateBlockchainDto.Owner,
+        updateBlockchainDto.AppraisedValue
+      );
+
+      return {
+        message: `This action updates asset - #${assetId} `,
+        data: res,
+      };
+    } catch (error) {
+      return {
+        message: `******** FAILED to return an error`,
+        data: error,
+      };
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} blockchain`;
+  /**
+   * Submit a transaction synchronously, blocking until it has been committed to the ledger.
+   * Delete asset on the ledger.
+   */
+  async remove(assetId: string) {
+    try {
+      let res = await this.Contract.submitTransaction(
+        "DeleteAsset", // Smart Contract/Chain code Ref
+        assetId
+      );
+
+      return {
+        message: `This action deleted asset - #${assetId} `,
+        data: res,
+      };
+    } catch (error) {
+      return {
+        message: `******** FAILED to return an error`,
+        data: error,
+      };
+    }
   }
 
   // Update an existing asset owner asynchronously.
@@ -222,7 +280,26 @@ export class BlockchainService {
       "\n--> Evaluate Transaction: GetAllAssets, function returns all the current assets on the ledger"
     );
 
-    const resultBytes = await contract.evaluateTransaction("GetAllAssets");
+    const resultBytes = await contract.evaluateTransaction("GetAllAssets"); // "GetAllAssets" Smart Contract/Chain code Ref
+    const utf8Decoder = new TextDecoder();
+    const resultJson = utf8Decoder.decode(resultBytes);
+    const result = JSON.parse(resultJson);
+    console.log("*** Result:", result);
+    return result;
+  }
+
+  /**
+   * Evaluate a transaction to query ledger state.
+   */
+  async getassetHistory(contract: Contract, assetID: string): Promise<void> {
+    console.log(
+      "\n--> Evaluate Transaction: GetHistoryForKey, function returns all the current assets history on the ledger"
+    );
+
+    const resultBytes = await contract.evaluateTransaction(
+      "GetHistoryForKey",
+      assetID
+    ); // "GetHistoryForKey" Smart Contract/Chain code Ref
     const utf8Decoder = new TextDecoder();
     const resultJson = utf8Decoder.decode(resultBytes);
     const result = JSON.parse(resultJson);
@@ -239,7 +316,7 @@ export class BlockchainService {
       "\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger"
     );
     // Initialize a set of asset data on the ledger using the chaincode 'InitLedger' function.
-    let res = await this.Contract.submitTransaction("InitLedger");
+    let res = await this.Contract.submitTransaction("InitLedger"); // "InitLedger" Smart Contract/Chain code Ref
     console.log("*** Transaction committed successfully");
     return res;
   }
@@ -257,6 +334,7 @@ export class BlockchainService {
       "\n--> Async Submit Transaction: TransferAsset, updates existing asset owner"
     );
 
+    // "TransferAsset" Smart Contract/Chain code Ref
     const commit = await contract.submitAsync("TransferAsset", {
       arguments: [assetId, newOwnerName],
     });

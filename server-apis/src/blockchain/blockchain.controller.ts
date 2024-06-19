@@ -31,6 +31,11 @@ export class BlockchainController {
     return this.blockchainService.findAll();
   }
 
+  @Get("assetHistory/:assetId")
+  findAssetHistory(@Param("assetId") assetId: string) {
+    return this.blockchainService.findAssetHistory(assetId);
+  }
+
   @Get(":assetId")
   findOne(@Param("assetId") assetId: string) {
     return this.blockchainService.findOne(assetId);
@@ -44,16 +49,16 @@ export class BlockchainController {
     return this.blockchainService.updateAssetOwner(assetId, payload);
   }
 
-  @Patch(":id")
+  @Patch(":assetId")
   update(
-    @Param("id") id: string,
+    @Param("assetId") assetId: string,
     @Body() updateBlockchainDto: UpdateBlockchainDto
   ) {
-    return this.blockchainService.update(+id, updateBlockchainDto);
+    return this.blockchainService.update(assetId, updateBlockchainDto);
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.blockchainService.remove(+id);
+  @Delete(":assetId")
+  remove(@Param("assetId") assetId: string) {
+    return this.blockchainService.remove(assetId);
   }
 }
