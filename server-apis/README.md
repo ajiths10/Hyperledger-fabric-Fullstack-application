@@ -4,6 +4,16 @@
 
 [Documantion link ](https://documenter.getpostman.com/view/20002068/2sA3XTdzAk).
 
+## route Documanion
+1. Route - "/blockchain" chaincode need to run from this repo [repo link ](https://documenter.getpostman.com/view/20002068/2sA3XTdzAk) 
+
+   ```
+   ./network.sh up createChannel -c mychannel -ca
+   # To deploy the TypeScript chaincode implementation
+   ./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-typescript/ -ccl typescript
+   ```
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>

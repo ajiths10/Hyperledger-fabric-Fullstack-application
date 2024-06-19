@@ -22,11 +22,6 @@ The Fabric test network is used to deploy and run this sample. Follow these step
    # To deploy the TypeScript chaincode implementation
    ./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-typescript/ -ccl typescript
 
-   # To deploy the Go chaincode implementation
-   ./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-go/ -ccl go
-
-   # To deploy the Java chaincode implementation
-   ./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-java/ -ccl java
    ```
 
 1. Run the application (from the `asset-transfer-basic` folder).
@@ -37,13 +32,6 @@ The Fabric test network is used to deploy and run this sample. Follow these step
    npm install
    npm start
 
-   # To run the Go sample application
-   cd application-gateway-go
-   go run .
-
-   # To run the Java sample application
-   cd application-gateway-java
-   ./gradlew run
    ```
 
 ## Clean up
