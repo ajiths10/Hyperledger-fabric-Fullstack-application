@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
-import { CreateBlockchainDto } from "./dto/create-blockchain.dto";
-import { UpdateBlockchainDto } from "./dto/update-blockchain.dto";
+import { CreateCarGarageDto } from "./dto/create-car-garage.dto";
+import { UpdateCarGarageDto } from "./dto/update-car-garage.dto";
 import * as grpc from "@grpc/grpc-js";
 import {
   connect,
@@ -16,7 +16,7 @@ import { TextDecoder } from "util";
 import { UpdateAssetOwnerBlockchainDto } from "./dto/update-asset-owner-blockchain.dto";
 
 @Injectable()
-export class BlockchainService {
+export class CarGarageService {
   channelName: string;
   chaincodeName: string;
   mspId: string;
@@ -29,7 +29,7 @@ export class BlockchainService {
   Contract: Contract;
 
   constructor() {
-    this.channelName = "garage-cars";
+    this.channelName = "mychannel";
     this.chaincodeName = envOrDefault("CHAINCODE_NAME", "basic");
     this.mspId = envOrDefault("MSP_ID", "Org1MSP");
 
@@ -144,21 +144,28 @@ export class BlockchainService {
   /**
    * Submit a transaction synchronously, blocking until it has been committed to the ledger.
    */
-  async create(createBlockchainDto: CreateBlockchainDto) {
+  async create(CreateCarGarageDto: CreateCarGarageDto) {
+    const { Model, Color, Owner, Year, VIN, EngineType, Mileage } =
+      CreateCarGarageDto;
     console.log(
       "\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments"
     );
     const assetId = `asset${Date.now()}`;
-
+    const json = JSON.stringify({
+      ID: assetId,
+      Model: Model,
+      Color: Color,
+      Owner: Owner,
+      Year: Year,
+      VIN: VIN,
+      EngineType: EngineType,
+      Mileage: Mileage,
+    });
     try {
       // Create a new asset on the ledger.
       await this.Contract.submitTransaction(
         "CreateAsset", // Smart Contract/Chain code Ref
-        assetId,
-        createBlockchainDto.Color,
-        createBlockchainDto.Size,
-        createBlockchainDto.Owner,
-        createBlockchainDto.AppraisedValue
+        json
       );
     } catch (error) {
       console.error("******** FAILED to run the application:", error);
@@ -213,28 +220,28 @@ export class BlockchainService {
    * Submit a transaction synchronously, blocking until it has been committed to the ledger.
    * Update asset on the ledger.
    */
-  async update(assetId: string, updateBlockchainDto: UpdateBlockchainDto) {
-    try {
-      let res = await this.Contract.submitTransaction(
-        "UpdateAsset", // Smart Contract/Chain code Ref
-        assetId,
-        updateBlockchainDto.Color,
-        updateBlockchainDto.Size,
-        updateBlockchainDto.Owner,
-        updateBlockchainDto.AppraisedValue
-      );
+  // async update(assetId: string, UpdateCarGarageDto: UpdateCarGarageDto) {
+  //   try {
+  //     let res = await this.Contract.submitTransaction(
+  //       "UpdateAsset", // Smart Contract/Chain code Ref
+  //       assetId,
+  //       updateBlockchainDto.Color,
+  //       updateBlockchainDto.Size,
+  //       updateBlockchainDto.Owner,
+  //       updateBlockchainDto.AppraisedValue
+  //     );
 
-      return {
-        message: `This action updates asset - #${assetId} `,
-        data: res,
-      };
-    } catch (error) {
-      return {
-        message: `******** FAILED to return an error`,
-        data: error,
-      };
-    }
-  }
+  //     return {
+  //       message: `This action updates asset - #${assetId} `,
+  //       data: res,
+  //     };
+  //   } catch (error) {
+  //     return {
+  //       message: `******** FAILED to return an error`,
+  //       data: error,
+  //     };
+  //   }
+  // }
 
   /**
    * Submit a transaction synchronously, blocking until it has been committed to the ledger.

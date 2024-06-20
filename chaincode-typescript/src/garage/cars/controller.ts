@@ -54,8 +54,9 @@ export class CarGarageContract extends Contract {
 
   // CreateAsset issues a new asset to the world state with given details.
   @Transaction()
-  public async CreateAsset(ctx: Context, json: Cars): Promise<void> {
-    const { ID, Model, Color, Owner, Year, VIN, EngineType, Mileage } = json;
+  public async CreateAsset(ctx: Context, json: string): Promise<void> {
+    const { ID, Model, Color, Owner, Year, VIN, EngineType, Mileage } =
+      JSON.parse(json) as Cars;
     const exists = await this.AssetExists(ctx, ID);
     if (exists) {
       throw new Error(`The asset ${ID} already exists`);
@@ -89,8 +90,9 @@ export class CarGarageContract extends Contract {
 
   // UpdateAsset updates an existing asset in the world state with provided parameters.
   @Transaction()
-  public async UpdateAsset(ctx: Context, json: Cars): Promise<void> {
-    const { ID, Model, Color, Owner, Year, VIN, EngineType, Mileage } = json;
+  public async UpdateAsset(ctx: Context, json: string): Promise<void> {
+    const { ID, Model, Color, Owner, Year, VIN, EngineType, Mileage } =
+      JSON.parse(json) as Cars;
     const exists = await this.AssetExists(ctx, ID);
     if (!exists) {
       throw new Error(`The asset ${ID} does not exist`);
@@ -151,10 +153,10 @@ export class CarGarageContract extends Contract {
     return oldOwner;
   }
 
-  // GetAllAssets returns all assets found in the world state.
+  // GetAllGarageCars returns all assets found in the world state.
   @Transaction(false)
   @Returns("string")
-  public async GetAllAssets(ctx: Context): Promise<string> {
+  public async GetAllGarageCars(ctx: Context): Promise<string> {
     const allResults = [];
     // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
     const iterator = await ctx.stub.getStateByRange("", "");
