@@ -16,7 +16,7 @@ import { TextDecoder } from "util";
 import { UpdateAssetOwnerBlockchainDto } from "./dto/update-asset-owner-blockchain.dto";
 
 @Injectable()
-export class BlockchainService {
+export class BlockchainService implements OnModuleInit {
   channelName: string;
   chaincodeName: string;
   mspId: string;
@@ -29,7 +29,7 @@ export class BlockchainService {
   Contract: Contract;
 
   constructor() {
-    this.channelName = "garage-cars";
+    this.channelName = "mychannel";
     this.chaincodeName = envOrDefault("CHAINCODE_NAME", "basic");
     this.mspId = envOrDefault("MSP_ID", "Org1MSP");
 

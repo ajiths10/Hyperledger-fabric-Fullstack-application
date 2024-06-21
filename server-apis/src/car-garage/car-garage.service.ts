@@ -16,32 +16,28 @@ import { TextDecoder } from "util";
 import { UpdateAssetOwnerBlockchainDto } from "./dto/update-asset-owner-blockchain.dto";
 
 @Injectable()
-export class CarGarageService {
-  channelName: string;
-  chaincodeName: string;
-  mspId: string;
-  cryptoPath: string;
-  keyDirectoryPath: string;
-  certDirectoryPath: string;
-  tlsCertPath: string;
-  peerEndpoint: string;
-  peerHostAlias: string;
-  Contract: Contract;
+export class CarGarageService implements OnModuleInit {
+  private readonly channelName: string;
+  private readonly chaincodeName: string;
+  private readonly mspId: string;
+  private readonly cryptoPath: string;
+  private readonly keyDirectoryPath: string;
+  private readonly certDirectoryPath: string;
+  private readonly tlsCertPath: string;
+  private readonly peerEndpoint: string;
+  private readonly peerHostAlias: string;
+  private Contract: Contract;
 
   constructor() {
-    this.channelName = "mychannel";
-    this.chaincodeName = envOrDefault("CHAINCODE_NAME", "basic");
-    this.mspId = envOrDefault("MSP_ID", "Org1MSP");
-
-    // Path to crypto materials.
+    (this.channelName = "garagecars"),
+      (this.chaincodeName = envOrDefault("CHAINCODE_NAME_GARAGECARS", "basic")),
+      (this.mspId = envOrDefault("MSP_ID", "Org1MSP"));
     this.cryptoPath = envOrDefault(
       "CRYPTO_PATH",
       path.resolve(
         "/home/ajiths/Desktop/Growcoms/blockchain/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com"
       )
     );
-
-    // Path to user private key directory.
     this.keyDirectoryPath = envOrDefault(
       "KEY_DIRECTORY_PATH",
       path.resolve(
@@ -52,8 +48,6 @@ export class CarGarageService {
         "keystore"
       )
     );
-
-    // Path to user certificate directory.
     this.certDirectoryPath = envOrDefault(
       "CERT_DIRECTORY_PATH",
       path.resolve(
@@ -64,8 +58,6 @@ export class CarGarageService {
         "signcerts"
       )
     );
-
-    // Path to peer tls certificate.
     this.tlsCertPath = envOrDefault(
       "TLS_CERT_PATH",
       path.resolve(
@@ -76,19 +68,12 @@ export class CarGarageService {
         "ca.crt"
       )
     );
-
-    // Gateway peer endpoint.
     this.peerEndpoint = envOrDefault("PEER_ENDPOINT", "localhost:7051");
-
-    // Gateway peer SSL host name override.
     this.peerHostAlias = envOrDefault(
       "PEER_HOST_ALIAS",
       "peer0.org1.example.com"
     );
 
-    /**
-     * displayInputParameters() will print the global scope parameters used by the main driver routine.
-     */
     console.log(`channelName:       ${this.channelName}`);
     console.log(`chaincodeName:     ${this.chaincodeName}`);
     console.log(`mspId:             ${this.mspId}`);
@@ -101,44 +86,36 @@ export class CarGarageService {
   }
 
   async onModuleInit() {
-    // This is where you perform your asynchronous initialization
-    this.Contract = await this.loadData();
+    this.Contract = await this.connectToChannel(
+      this.channelName,
+      this.chaincodeName
+    );
   }
 
-  private async loadData() {
+  private async connectToChannel(channelName: string, chaincodeName: string) {
     try {
-      // The gRPC client connection should be shared by all Gateway connections to this endpoint.
       const client = await this.newGrpcConnection();
-
       const gateway = connect({
         client,
         identity: await this.newIdentity(),
         signer: await this.newSigner(),
-        // Default timeouts for different gRPC calls
-        evaluateOptions: () => {
-          return { deadline: Date.now() + 5000 }; // 5 seconds
-        },
-        endorseOptions: () => {
-          return { deadline: Date.now() + 15000 }; // 15 seconds
-        },
-        submitOptions: () => {
-          return { deadline: Date.now() + 5000 }; // 5 seconds
-        },
-        commitStatusOptions: () => {
-          return { deadline: Date.now() + 60000 }; // 1 minute
-        },
+        evaluateOptions: () => ({ deadline: Date.now() + 5000 }),
+        endorseOptions: () => ({ deadline: Date.now() + 15000 }),
+        submitOptions: () => ({ deadline: Date.now() + 5000 }),
+        commitStatusOptions: () => ({ deadline: Date.now() + 60000 }),
       });
 
-      // Get a network instance representing the channel where the smart contract is deployed.
-      const network = gateway.getNetwork(this.channelName);
-
-      // Get the smart contract from the network.
-      const contract = network.getContract(this.chaincodeName);
+      const network = gateway.getNetwork(channelName);
+      const contract = network.getContract(chaincodeName);
       return contract;
     } catch (error) {
-      console.error("******** FAILED to run the application:", error);
+      console.error(`Failed to connect to channel ${channelName}:`, error);
       process.exitCode = 1;
     }
+  }
+
+  getContract(channelName: string) {
+    return this.Contract[channelName];
   }
 
   /**
@@ -148,7 +125,7 @@ export class CarGarageService {
     const { Model, Color, Owner, Year, VIN, EngineType, Mileage } =
       CreateCarGarageDto;
     console.log(
-      "\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments"
+      "\n--> Submit Transaction: CreateGarageCarAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments"
     );
     const assetId = `asset${Date.now()}`;
     const json = JSON.stringify({
@@ -164,7 +141,7 @@ export class CarGarageService {
     try {
       // Create a new asset on the ledger.
       await this.Contract.submitTransaction(
-        "CreateAsset", // Smart Contract/Chain code Ref
+        "CreateGarageCarAsset", // Smart Contract/Chain code Ref
         json
       );
     } catch (error) {
@@ -176,10 +153,28 @@ export class CarGarageService {
     return "*** Transaction committed successfully";
   }
 
-  // Return all the current assets on the ledger.
+  /**
+   * Evaluate a transaction to query ledger state.
+   * Return all the current assets on the ledger.
+   */
   async findAll() {
-    let data = await this.getAllAssets(this.Contract);
-    return data;
+    console.log(
+      "\n--> Evaluate Transaction: GetAllGarageCars, function returns all the current assets on the ledger"
+    );
+    try {
+      const resultBytes =
+        await this.Contract.evaluateTransaction("GetAllGarageCars"); // "GetAllGarageCars" Smart Contract/ChainCode Ref
+      const utf8Decoder = new TextDecoder();
+      const resultJson = utf8Decoder.decode(resultBytes);
+      const result = JSON.parse(resultJson);
+      console.log("*** Result:", result);
+      return result;
+    } catch (error) {
+      return {
+        message: `******** FAILED to return an error`,
+        data: error,
+      };
+    }
   }
 
   // Return all the current assets on the ledger.
@@ -281,22 +276,6 @@ export class CarGarageService {
   /**
    * Evaluate a transaction to query ledger state.
    */
-  async getAllAssets(contract: Contract): Promise<void> {
-    console.log(
-      "\n--> Evaluate Transaction: GetAllAssets, function returns all the current assets on the ledger"
-    );
-
-    const resultBytes = await contract.evaluateTransaction("GetAllAssets"); // "GetAllAssets" Smart Contract/Chain code Ref
-    const utf8Decoder = new TextDecoder();
-    const resultJson = utf8Decoder.decode(resultBytes);
-    const result = JSON.parse(resultJson);
-    console.log("*** Result:", result);
-    return result;
-  }
-
-  /**
-   * Evaluate a transaction to query ledger state.
-   */
   async getassetHistory(contract: Contract, assetID: string): Promise<void> {
     console.log(
       "\n--> Evaluate Transaction: GetHistoryForKey, function returns all the current assets history on the ledger"
@@ -321,8 +300,8 @@ export class CarGarageService {
     console.log(
       "\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger"
     );
-    // Initialize a set of asset data on the ledger using the chaincode 'InitLedger' function.
-    let res = await this.Contract.submitTransaction("InitLedger"); // "InitLedger" Smart Contract/Chain code Ref
+    // Initialize a set of asset data on the ledger using the chaincode 'InitGarageCarLedger' function.
+    let res = await this.Contract.submitTransaction("InitGarageCarLedger"); // "InitGarageCarLedger" Smart Contract/Chain code Ref
     console.log("*** Transaction committed successfully");
     return res;
   }
@@ -362,7 +341,7 @@ export class CarGarageService {
     console.log("*** Transaction committed successfully");
   }
 
-  async newGrpcConnection(): Promise<grpc.Client> {
+  private async newGrpcConnection(): Promise<grpc.Client> {
     const tlsRootCert = await fs.readFile(this.tlsCertPath);
     const tlsCredentials = grpc.credentials.createSsl(tlsRootCert);
     return new grpc.Client(this.peerEndpoint, tlsCredentials, {
@@ -370,19 +349,19 @@ export class CarGarageService {
     });
   }
 
-  async newIdentity(): Promise<Identity> {
+  private async newIdentity(): Promise<Identity> {
     const certPath = await this.getFirstDirFileName(this.certDirectoryPath);
     const credentials = await fs.readFile(certPath);
     const mspId = this.mspId;
     return { mspId, credentials };
   }
 
-  async getFirstDirFileName(dirPath: string): Promise<string> {
+  private async getFirstDirFileName(dirPath: string): Promise<string> {
     const files = await fs.readdir(dirPath);
     return path.join(dirPath, files[0]);
   }
 
-  async newSigner(): Promise<Signer> {
+  private async newSigner(): Promise<Signer> {
     const keyPath = await this.getFirstDirFileName(this.keyDirectoryPath);
     const privateKeyPem = await fs.readFile(keyPath);
     const privateKey = crypto.createPrivateKey(privateKeyPem);

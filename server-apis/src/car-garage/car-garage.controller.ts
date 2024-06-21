@@ -15,6 +15,11 @@ import { UpdateCarGarageDto } from "./dto/update-car-garage.dto";
 export class CarGarageController {
   constructor(private readonly carGarageService: CarGarageService) {}
 
+  @Post("/initLedger")
+  initLedger() {
+    return this.carGarageService.initLedger();
+  }
+
   @Post()
   create(@Body() createCarGarageDto: CreateCarGarageDto) {
     return this.carGarageService.create(createCarGarageDto);

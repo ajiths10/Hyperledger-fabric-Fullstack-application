@@ -1,31 +1,23 @@
 /*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
  * SPDX-License-Identifier: Apache-2.0
  */
-// Deterministic JSON.stringify()
-import {
-  Context,
-  Contract,
-  Info,
-  Returns,
-  Transaction,
-} from "fabric-contract-api";
-import stringify from "json-stringify-deterministic";
-import sortKeysRecursive from "sort-keys-recursive";
-import { Asset } from "./asset";
 
-@Info({
-  title: "AssetTransfer",
-  description: "Smart contract for trading assets",
-})
-export class AssetTransferContract extends Contract {
+"use strict";
+
+// Deterministic JSON.stringify()
+const stringify = require("json-stringify-deterministic");
+const sortKeysRecursive = require("sort-keys-recursive");
+const { Contract } = require("fabric-contract-api");
+
+class AssetTransfer extends Contract {
   constructor() {
     //Unique smart contract name when multiple contracts per chaincode
-    super("AssetTransferContract");
+    super("AssetTransfer");
   }
-
-  @Transaction()
-  public async InitLedger(ctx: Context): Promise<void> {
-    const assets: Asset[] = [
+  async InitLedger(ctx) {
+    const assets = [
       {
         ID: "asset1",
         Color: "blue",
@@ -80,20 +72,11 @@ export class AssetTransferContract extends Contract {
         asset.ID,
         Buffer.from(stringify(sortKeysRecursive(asset)))
       );
-      console.info(`Asset ${asset.ID} initialized`);
     }
   }
 
   // CreateAsset issues a new asset to the world state with given details.
-  @Transaction()
-  public async CreateAsset(
-    ctx: Context,
-    id: string,
-    color: string,
-    size: number,
-    owner: string,
-    appraisedValue: number
-  ): Promise<void> {
+  async CreateAsset(ctx, id, color, size, owner, appraisedValue) {
     const exists = await this.AssetExists(ctx, id);
     if (exists) {
       throw new Error(`The asset ${id} already exists`);
@@ -111,28 +94,20 @@ export class AssetTransferContract extends Contract {
       id,
       Buffer.from(stringify(sortKeysRecursive(asset)))
     );
+    return JSON.stringify(asset);
   }
 
   // ReadAsset returns the asset stored in the world state with given id.
-  @Transaction(false)
-  public async ReadAsset(ctx: Context, id: string): Promise<string> {
+  async ReadAsset(ctx, id) {
     const assetJSON = await ctx.stub.getState(id); // get the asset from chaincode state
-    if (assetJSON.length === 0) {
+    if (!assetJSON || assetJSON.length === 0) {
       throw new Error(`The asset ${id} does not exist`);
     }
     return assetJSON.toString();
   }
 
   // UpdateAsset updates an existing asset in the world state with provided parameters.
-  @Transaction()
-  public async UpdateAsset(
-    ctx: Context,
-    id: string,
-    color: string,
-    size: number,
-    owner: string,
-    appraisedValue: number
-  ): Promise<void> {
+  async UpdateAsset(ctx, id, color, size, owner, appraisedValue) {
     const exists = await this.AssetExists(ctx, id);
     if (!exists) {
       throw new Error(`The asset ${id} does not exist`);
@@ -154,8 +129,7 @@ export class AssetTransferContract extends Contract {
   }
 
   // DeleteAsset deletes an given asset from the world state.
-  @Transaction()
-  public async DeleteAsset(ctx: Context, id: string): Promise<void> {
+  async DeleteAsset(ctx, id) {
     const exists = await this.AssetExists(ctx, id);
     if (!exists) {
       throw new Error(`The asset ${id} does not exist`);
@@ -164,22 +138,15 @@ export class AssetTransferContract extends Contract {
   }
 
   // AssetExists returns true when asset with given ID exists in world state.
-  @Transaction(false)
-  @Returns("boolean")
-  public async AssetExists(ctx: Context, id: string): Promise<boolean> {
+  async AssetExists(ctx, id) {
     const assetJSON = await ctx.stub.getState(id);
-    return assetJSON.length > 0;
+    return assetJSON && assetJSON.length > 0;
   }
 
-  // TransferAsset updates the owner field of asset with given id in the world state, and returns the old owner.
-  @Transaction()
-  public async TransferAsset(
-    ctx: Context,
-    id: string,
-    newOwner: string
-  ): Promise<string> {
+  // TransferAsset updates the owner field of asset with given id in the world state.
+  async TransferAsset(ctx, id, newOwner) {
     const assetString = await this.ReadAsset(ctx, id);
-    const asset = JSON.parse(assetString) as Asset;
+    const asset = JSON.parse(assetString);
     const oldOwner = asset.Owner;
     asset.Owner = newOwner;
     // we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
@@ -191,9 +158,7 @@ export class AssetTransferContract extends Contract {
   }
 
   // GetAllAssets returns all assets found in the world state.
-  @Transaction(false)
-  @Returns("string")
-  public async GetAllAssets(ctx: Context): Promise<string> {
+  async GetAllAssets(ctx) {
     const allResults = [];
     // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
     const iterator = await ctx.stub.getStateByRange("", "");
@@ -204,7 +169,7 @@ export class AssetTransferContract extends Contract {
       );
       let record;
       try {
-        record = JSON.parse(strValue) as Asset;
+        record = JSON.parse(strValue);
       } catch (err) {
         console.log(err);
         record = strValue;
@@ -214,34 +179,6 @@ export class AssetTransferContract extends Contract {
     }
     return JSON.stringify(allResults);
   }
-
-  // GetHistoryForKey returns all assets history in the world state.
-  @Transaction(false)
-  @Returns("string")
-  public async GetHistoryForKey(ctx: Context, id: string): Promise<string> {
-    const results: string[] = [];
-    try {
-      const historyIterator = await ctx.stub.getHistoryForKey(id);
-      let result = await historyIterator.next();
-      if (result.done) {
-        const errorMessage = `Asset ${id} does not exist`;
-        console.log(errorMessage);
-        throw new Error(errorMessage);
-      }
-
-      while (!result.done) {
-        const iteratorValue = Buffer.from(
-          result.value.value.toString()
-        ).toString("utf8");
-        results.push(iteratorValue);
-        console.log(iteratorValue);
-        result = await historyIterator.next();
-      }
-
-      await historyIterator.close();
-    } catch (error) {
-      console.log(error);
-    }
-    return JSON.stringify(results);
-  }
 }
+
+module.exports = AssetTransfer;
