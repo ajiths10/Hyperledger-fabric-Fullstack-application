@@ -310,14 +310,21 @@ export class BlockchainService implements OnModuleInit {
    * This type of transaction would typically only be run once by an application the first time it was started after its
    * initial deployment. A new version of the chaincode deployed later would likely not need to run an "init" function.
    */
-  async initLedger(): Promise<Uint8Array> {
-    console.log(
-      "\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger"
-    );
-    // Initialize a set of asset data on the ledger using the chaincode 'InitLedger' function.
-    let res = await this.Contract.submitTransaction("InitLedger"); // "InitLedger" Smart Contract/Chain code Ref
-    console.log("*** Transaction committed successfully");
-    return res;
+  async initLedger() {
+    try {
+      console.log(
+        "\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger"
+      );
+      // Initialize a set of asset data on the ledger using the chaincode 'InitLedger' function.
+      let res = await this.Contract.submitTransaction("InitLedger"); // "InitLedger" Smart Contract/Chain code Ref
+      console.log("*** Transaction committed successfully");
+      return res;
+    } catch (error) {
+      return {
+        message: `******** FAILED to return an error`,
+        data: error,
+      };
+    }
   }
 
   /**

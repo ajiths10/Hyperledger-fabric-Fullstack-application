@@ -9,3 +9,5 @@ export const contracts: (typeof Contract)[] = [
   AssetTransferContract,
   CarGarageContract,
 ];
+
+// multi-contract chaincodes
