@@ -21,6 +21,11 @@ export class BlockchainController {
     return this.blockchainService.initLedger();
   }
 
+  @Post("test/initLedger")
+  initLedgertest() {
+    return this.blockchainService.initLedgertest();
+  }
+
   @Post()
   create(@Body() createBlockchainDto: CreateBlockchainDto) {
     return this.blockchainService.create(createBlockchainDto);
