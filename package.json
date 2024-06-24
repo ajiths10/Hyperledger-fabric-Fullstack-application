@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@nestjs/config": "^3.2.2",
+    "@nestjs/schedule": "^4.0.2",
+    "helmet": "^7.1.0",
+    "typeorm": "^0.3.20"
+  }
+}
