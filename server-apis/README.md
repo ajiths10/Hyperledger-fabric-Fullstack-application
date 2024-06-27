@@ -5,14 +5,16 @@
 [Documantion link ](https://documenter.getpostman.com/view/20002068/2sA3XTdzAk).
 
 ## route Documanion
-1. Route - "/blockchain" chaincode need to run from this repo [repo link ](https://documenter.getpostman.com/view/20002068/2sA3XTdzAk) 
 
-   ```
-   ./network.sh up createChannel -c mychannel -ca
-   # To deploy the TypeScript chaincode implementation
-   ./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-typescript/ -ccl typescript
-   ```
+1. Route - "/blockchain" chaincode need to run from this repo [repo link ](https://documenter.getpostman.com/view/20002068/2sA3XTdzAk)
 
+    ```
+    ./network.sh up createChannel -c mychannel -ca  # using couchDB -  ./network.sh up createChannel -ca -s couchdb
+    # couchDB will be exposed to - http://localhost:5984/_utils/
+
+    # To deploy the TypeScript chaincode implementation
+    ./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-typescript/ -ccl typescript
+    ```
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
@@ -80,9 +82,9 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+-   Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
+-   Website - [https://nestjs.com](https://nestjs.com/)
+-   Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
