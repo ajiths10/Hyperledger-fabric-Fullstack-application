@@ -135,6 +135,8 @@ export class BlockchainService implements OnModuleInit {
             const network = gateway.getNetwork(this.channelName);
 
             // Get the smart contract from the network.
+            // IMPORTANT - You need to explicitly request the correct contract within the chaincode package
+            // IMPORTANT - Ref - https://github.com/hyperledger/fabric-samples/issues/1229
             const contract = network.getContract(
                 this.chaincodeName,
                 this.contractName

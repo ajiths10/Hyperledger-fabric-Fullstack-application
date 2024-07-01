@@ -123,6 +123,8 @@ export class CarGarageService implements OnModuleInit {
             });
 
             const network = gateway.getNetwork(channelName);
+            // IMPORTANT - You need to explicitly request the correct contract within the chaincode package
+            // IMPORTANT - Ref - https://github.com/hyperledger/fabric-samples/issues/1229
             const contract = network.getContract(
                 chaincodeName,
                 this.contractName
