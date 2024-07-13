@@ -1,0 +1,48 @@
+{
+    "name": "js-project-init-ref",
+    "version": "1.0.0",
+    "main": "index.js",
+    "description": "contract implemented in JavaScript",
+    "scripts": {
+        "lint": "eslint *.js */**.js",
+        "pretest": "npm run lint",
+        "test": "nyc mocha --recursive",
+        "start": "fabric-chaincode-node start",
+        "format": "prettier --write \"lib/**/*.js\" \"test/**/*.ts\""
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "engines": {
+        "node": ">=18"
+    },
+    "engineStrict": true,
+    "dependencies": {
+        "fabric-contract-api": "~2.5.5",
+        "fabric-shim": "~2.5.5"
+    },
+    "devDependencies": {
+        "eslint": "^8.42.0",
+        "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-prettier": "^5.0.0",
+        "prettier": "^3.0.0"
+    },
+    "nyc": {
+        "exclude": [
+            "coverage/**",
+            "test/**",
+            "index.js",
+            ".eslintrc.js"
+        ],
+        "reporter": [
+            "text-summary",
+            "html"
+        ],
+        "all": true,
+        "check-coverage": true,
+        "statements": 100,
+        "branches": 100,
+        "functions": 100,
+        "lines": 100
+    }
+}
