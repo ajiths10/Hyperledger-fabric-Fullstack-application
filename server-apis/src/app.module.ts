@@ -6,6 +6,7 @@ import { AppService } from "./app.service";
 import { BlockchainModule } from "./blockchain/blockchain.module";
 import { CarGarageModule } from "./car-garage/car-garage.module";
 import { MotocycleGarageModule } from "./motocycle-garage/motocycle-garage.module";
+import { PatientsModule } from './patients/patients.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -13,6 +14,7 @@ import { MotocycleGarageModule } from "./motocycle-garage/motocycle-garage.modul
     BlockchainModule,
     CarGarageModule,
     MotocycleGarageModule,
+    PatientsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
