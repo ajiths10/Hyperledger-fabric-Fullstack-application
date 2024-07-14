@@ -23,15 +23,26 @@ export class PatientsService implements OnModuleInit {
 
     async onModuleInit() {
         try {
-            this.Contract = await this.ledgerUtilsService.connectToChannel({ channelName: this.channelName, chaincodeName: this.chaincodeName, contractName: this.contractName });
+            this.Contract = await this.ledgerUtilsService.connectToChannel({ channelName: this.channelName, chaincodeName: this.chaincodeName });
         } catch (error) {
             console.log('<<< ====== Connet to Channel Error ====== >>>');
             console.log(error?.message);
         }
     }
 
-    initLedger() {
-        return 'This action adds a new patient';
+    async initLedger() {
+        try {
+            console.log('\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger');
+            // Initialize a set of asset data on the ledger using the chaincode 'InitPatientsLedger' function.
+            let res = await this.Contract.submitTransaction('InitPatientsLedger'); // "InitPatientsLedger" Smart Contract/Chain code Ref
+            console.log('*** Transaction committed successfully');
+            return res;
+        } catch (error) {
+            return {
+                message: `******** FAILED to return an error`,
+                data: error,
+            };
+        }
     }
 
     create(createPatientDto: CreatePatientDto) {

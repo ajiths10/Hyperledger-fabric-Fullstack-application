@@ -1,0 +1,1 @@
+./network.sh deployCC -ccn patientsChaincode -ccp /home/ajiths/Desktop/PersonalProjects/hyperledger-fabric-Fullstack-application/MediLedger-chaincodes/patients-chaincode/ -ccl javascript -ccv 1.0 -c patients

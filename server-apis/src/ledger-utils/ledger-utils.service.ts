@@ -9,7 +9,7 @@ import { UtilsService } from 'src/utils/utils.service';
 type connectToChannelParamsType = {
     channelName: string;
     chaincodeName: string;
-    contractName: string;
+    contractName?: string;
 };
 
 @Injectable()
@@ -73,7 +73,7 @@ export class LedgerUtilsService {
              */
             console.log(`channelName:       ${channelName}`);
             console.log(`chaincodeName:     ${chaincodeName}`);
-            console.log(`contractName:     ${contractName}`);
+            console.log(`contractName:      ${contractName}`);
             console.log(`mspId:             ${this.mspId}`);
             console.log(`cryptoPath:        ${this.cryptoPath}`);
             console.log(`keyDirectoryPath:  ${this.keyDirectoryPath}`);
