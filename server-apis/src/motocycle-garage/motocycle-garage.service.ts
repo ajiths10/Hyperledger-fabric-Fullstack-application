@@ -1,18 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { CreateMotocycleGarageDto } from "./dto/create-motocycle-garage.dto";
-import { UpdateMotocycleGarageDto } from "./dto/update-motocycle-garage.dto";
-import * as grpc from "@grpc/grpc-js";
-import {
-    connect,
-    Contract,
-    Identity,
-    Signer,
-    signers,
-} from "@hyperledger/fabric-gateway";
-import * as crypto from "crypto";
-import { promises as fs } from "fs";
-import * as path from "path";
-import { TextDecoder } from "util";
+import { Injectable } from '@nestjs/common';
+import { CreateMotocycleGarageDto } from './dto/create-motocycle-garage.dto';
+import { UpdateMotocycleGarageDto } from './dto/update-motocycle-garage.dto';
+import * as grpc from '@grpc/grpc-js';
+import { connect, Contract, Identity, Signer, signers } from '@hyperledger/fabric-gateway';
+import * as crypto from 'crypto';
+import { promises as fs } from 'fs';
+import * as path from 'path';
+import { TextDecoder } from 'util';
 
 @Injectable()
 export class MotocycleGarageService {
@@ -28,53 +22,16 @@ export class MotocycleGarageService {
     private Contract: Contract;
 
     constructor() {
-        (this.channelName = "garagebikes"),
-            (this.chaincodeName = envOrDefault(
-                "CHAINCODE_NAME_GARAGECARS",
-                "basic"
-            )),
-            (this.mspId = envOrDefault("MSP_ID", "Org1MSP"));
+        (this.channelName = 'garagebikes'), (this.chaincodeName = envOrDefault('CHAINCODE_NAME_GARAGECARS', 'basic')), (this.mspId = envOrDefault('MSP_ID', 'Org1MSP'));
         this.cryptoPath = envOrDefault(
-            "CRYPTO_PATH",
-            path.resolve(
-                "/home/ajiths/Desktop/Growcoms/blockchain/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com"
-            )
+            'CRYPTO_PATH',
+            path.resolve('/home/ajiths/Desktop/PersonalProjects/blockchain/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com'),
         );
-        this.keyDirectoryPath = envOrDefault(
-            "KEY_DIRECTORY_PATH",
-            path.resolve(
-                this.cryptoPath,
-                "users",
-                "User1@org1.example.com",
-                "msp",
-                "keystore"
-            )
-        );
-        this.certDirectoryPath = envOrDefault(
-            "CERT_DIRECTORY_PATH",
-            path.resolve(
-                this.cryptoPath,
-                "users",
-                "User1@org1.example.com",
-                "msp",
-                "signcerts"
-            )
-        );
-        this.tlsCertPath = envOrDefault(
-            "TLS_CERT_PATH",
-            path.resolve(
-                this.cryptoPath,
-                "peers",
-                "peer0.org1.example.com",
-                "tls",
-                "ca.crt"
-            )
-        );
-        this.peerEndpoint = envOrDefault("PEER_ENDPOINT", "localhost:7051");
-        this.peerHostAlias = envOrDefault(
-            "PEER_HOST_ALIAS",
-            "peer0.org1.example.com"
-        );
+        this.keyDirectoryPath = envOrDefault('KEY_DIRECTORY_PATH', path.resolve(this.cryptoPath, 'users', 'User1@org1.example.com', 'msp', 'keystore'));
+        this.certDirectoryPath = envOrDefault('CERT_DIRECTORY_PATH', path.resolve(this.cryptoPath, 'users', 'User1@org1.example.com', 'msp', 'signcerts'));
+        this.tlsCertPath = envOrDefault('TLS_CERT_PATH', path.resolve(this.cryptoPath, 'peers', 'peer0.org1.example.com', 'tls', 'ca.crt'));
+        this.peerEndpoint = envOrDefault('PEER_ENDPOINT', 'localhost:7051');
+        this.peerHostAlias = envOrDefault('PEER_HOST_ALIAS', 'peer0.org1.example.com');
 
         console.log(`channelName:       ${this.channelName}`);
         console.log(`chaincodeName:     ${this.chaincodeName}`);
@@ -88,10 +45,7 @@ export class MotocycleGarageService {
     }
 
     async onModuleInit() {
-        this.Contract = await this.connectToChannel(
-            this.channelName,
-            this.chaincodeName
-        );
+        this.Contract = await this.connectToChannel(this.channelName, this.chaincodeName);
     }
 
     private async connectToChannel(channelName: string, chaincodeName: string) {
@@ -113,10 +67,7 @@ export class MotocycleGarageService {
             const contract = network.getContract(chaincodeName);
             return contract;
         } catch (error) {
-            console.error(
-                `Failed to connect to channel ${channelName}:`,
-                error
-            );
+            console.error(`Failed to connect to channel ${channelName}:`, error);
             process.exitCode = 1;
         }
     }
@@ -126,20 +77,17 @@ export class MotocycleGarageService {
     }
 
     create(createMotocycleGarageDto: CreateMotocycleGarageDto) {
-        return "This action adds a new motocycleGarage";
+        return 'This action adds a new motocycleGarage';
     }
 
     async findAll() {
-        console.log(
-            "\n--> Evaluate Transaction: GetAllGarageCars, function returns all the current assets on the ledger"
-        );
+        console.log('\n--> Evaluate Transaction: GetAllGarageCars, function returns all the current assets on the ledger');
         try {
-            const resultBytes =
-                await this.Contract.evaluateTransaction("GetAllGarageBikes"); // "GetAllGarageCars" Smart Contract/ChainCode Ref
+            const resultBytes = await this.Contract.evaluateTransaction('GetAllGarageBikes'); // "GetAllGarageCars" Smart Contract/ChainCode Ref
             const utf8Decoder = new TextDecoder();
             const resultJson = utf8Decoder.decode(resultBytes);
             const result = JSON.parse(resultJson);
-            console.log("*** Result:", result);
+            console.log('*** Result:', result);
             return result;
         } catch (error) {
             return {
@@ -166,12 +114,10 @@ export class MotocycleGarageService {
      * initial deployment. A new version of the chaincode deployed later would likely not need to run an "init" function.
      */
     async initLedger(): Promise<Uint8Array> {
-        console.log(
-            "\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger"
-        );
+        console.log('\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger');
         // Initialize a set of asset data on the ledger using the chaincode 'InitGarageCarLedger' function.
-        let res = await this.Contract.submitTransaction("InitGarageBikeLedger"); // "InitGarageCarLedger" Smart Contract/Chain code Ref
-        console.log("*** Transaction committed successfully");
+        let res = await this.Contract.submitTransaction('InitGarageBikeLedger'); // "InitGarageCarLedger" Smart Contract/Chain code Ref
+        console.log('*** Transaction committed successfully');
         return res;
     }
 
@@ -179,7 +125,7 @@ export class MotocycleGarageService {
         const tlsRootCert = await fs.readFile(this.tlsCertPath);
         const tlsCredentials = grpc.credentials.createSsl(tlsRootCert);
         return new grpc.Client(this.peerEndpoint, tlsCredentials, {
-            "grpc.ssl_target_name_override": this.peerHostAlias,
+            'grpc.ssl_target_name_override': this.peerHostAlias,
         });
     }
 

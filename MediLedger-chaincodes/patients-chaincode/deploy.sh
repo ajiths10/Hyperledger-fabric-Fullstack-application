@@ -39,7 +39,7 @@ echo $new_version > $VERSION_FILE
 
 ### specify your path
 # Change directory to the path where network.sh is located
-cd /home/ajiths/Desktop/Growcoms/blockchain/fabric-samples/test-network
+cd /home/ajiths/Desktop/PersonalProjects/blockchain/fabric-samples/test-network
 
 ### specify your path
 # Execute the network.sh script with the new version

@@ -30,7 +30,7 @@ export class LedgerUtilsService {
         // Path to crypto materials.
         this.cryptoPath = this.utilsService._envOrDefault(
             'CRYPTO_PATH',
-            path.resolve('/home/ajiths/Desktop/Growcoms/blockchain/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com'),
+            path.resolve('/home/ajiths/Desktop/PersonalProjects/blockchain/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com'),
         );
 
         // Path to user private key directory.
