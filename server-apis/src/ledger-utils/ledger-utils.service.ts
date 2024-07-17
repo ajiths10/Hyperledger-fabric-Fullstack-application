@@ -69,11 +69,11 @@ export class LedgerUtilsService {
             const contract = network.getContract(chaincodeName, contractName);
 
             /**
-             * displayInputParameters() will print the global scope parameters used by the main driver routine.
+             * Print Config
              */
             console.log(`channelName:       ${channelName}`);
             console.log(`chaincodeName:     ${chaincodeName}`);
-            console.log(`contractName:      ${contractName}`);
+            console.log(`contractName:      ${contractName || 'default'}`); // default - contract[index=0]
             console.log(`mspId:             ${this.mspId}`);
             console.log(`cryptoPath:        ${this.cryptoPath}`);
             console.log(`keyDirectoryPath:  ${this.keyDirectoryPath}`);
