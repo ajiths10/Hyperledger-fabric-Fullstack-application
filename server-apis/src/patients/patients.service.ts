@@ -4,6 +4,7 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 import { LedgerUtilsService } from 'src/ledger-utils/ledger-utils.service';
 import { Contract } from '@hyperledger/fabric-gateway';
 import { UtilsService } from 'src/utils/utils.service';
+import { ResponseWrapperService } from 'src/response_wrapper/response_wrapper.service';
 
 @Injectable()
 export class PatientsService implements OnModuleInit {
@@ -13,12 +14,13 @@ export class PatientsService implements OnModuleInit {
     private readonly chaincodeName: string;
 
     constructor(
-        private ledgerUtilsService: LedgerUtilsService,
-        private utilsService: UtilsService,
+        private readonly ledgerUtilsService: LedgerUtilsService,
+        private readonly utilsService: UtilsService,
+        private readonly responseWrapperService: ResponseWrapperService,
     ) {
         this.channelName = 'patients';
         this.contractName = 'patientContract';
-        this.chaincodeName = this.utilsService._envOrDefault('CHAINCODE_NAME', 'basic');
+        this.chaincodeName = this.utilsService._envOrDefault('CHAINCODE_NAME', 'patientsChaincode');
     }
 
     async onModuleInit() {
@@ -45,8 +47,16 @@ export class PatientsService implements OnModuleInit {
         }
     }
 
-    create(createPatientDto: CreatePatientDto) {
-        return 'This action adds a new patient';
+    async create(body: CreatePatientDto) {
+        try {
+            console.log('\n--> Submit Transaction: CreateAsset, function creates the initial set of assets on the ledger');
+            let res = await this.Contract.submitTransaction('CreateAsset', 'Asset_003', body.name, body.email, body.phone, body.dob, body.blood_group);
+            console.log('*** Transaction committed successfully');
+            return this.responseWrapperService._successResponse('Patient created successfully!', res);
+        } catch (error) {
+            console.log(`******** FAILED to return an error ***********`, error.message);
+            return this.responseWrapperService._errorResponse(error);
+        }
     }
 
     findAll() {
