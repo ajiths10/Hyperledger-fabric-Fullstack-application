@@ -14,23 +14,32 @@ class PatientContract extends Contract {
         return message;
     }
 
-    async CreateAsset(ctx, patientData) {
-        const exists = await this.AssetExists(ctx, patientData.patient_id);
+    async CreateAsset(ctx, p_id, name, email, phone, dob, blood_group) {
+        const exists = await this._assetExists(ctx, p_id);
         if (exists) {
-            throw new Error(`The asset ${patientData.patient_id} already exists`);
+            throw new Error(`The asset ${p_id} already exists`);
         }
         let indexName = 'Zoro123';
         let asset = {
-            patient_id: patientData.patient_id,
-            name: patientData.name,
-            email: patientData.email,
-            phone: patientData.phone,
-            dob: patientData.dob,
-            blood_group: patientData.blood_group,
+            patient_id: p_id,
+            name: name,
+            email: email,
+            phone: phone,
+            dob: dob,
+            blood_group: blood_group,
         };
-        await ctx.stub.putState(assetID, Buffer.from(JSON.stringify(asset)));
-        let colorNameIndexKey = await ctx.stub.createCompositeKey(indexName, [asset.name, asset.patient_id]);
-        await ctx.stub.putState(colorNameIndexKey, Buffer.from('\u0000'));
+        await ctx.stub.putState(p_id, Buffer.from(JSON.stringify(asset)));
+        let patientNameIndexKey = await ctx.stub.createCompositeKey(indexName, [asset.name, asset.patient_id]);
+        await ctx.stub.putState(patientNameIndexKey, Buffer.from('\u0000'));
+    }
+
+    // << ==================== Intenal functions ========================== >>>
+    // For internal functions... prefix them with _
+
+    // AssetExists returns true when asset with given ID exists in world state
+    async _assetExists(ctx, assetName) {
+        let assetState = await ctx.stub.getState(assetName);
+        return assetState && assetState.length > 0;
     }
 }
 
