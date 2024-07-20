@@ -9,6 +9,7 @@ import { MotocycleGarageModule } from "./motocycle-garage/motocycle-garage.modul
 import { PatientsModule } from "./patients/patients.module";
 import { LedgerUtilsModule } from './ledger-utils/ledger-utils.module';
 import { UtilsModule } from './utils/utils.module';
+import { ResponseWrapperModule } from './response_wrapper/response_wrapper.module';
 @Module({
     imports: [
         ConfigModule.forRoot(),
@@ -19,6 +20,7 @@ import { UtilsModule } from './utils/utils.module';
         PatientsModule,
         LedgerUtilsModule,
         UtilsModule,
+        ResponseWrapperModule,
     ],
     controllers: [AppController],
     providers: [AppService],
