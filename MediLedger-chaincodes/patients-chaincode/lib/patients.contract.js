@@ -36,7 +36,13 @@ class PatientContract extends Contract {
     // << ==================== Intenal functions ========================== >>>
     // For internal functions... prefix them with _
 
-    // AssetExists returns true when asset with given ID exists in world state
+    /**
+     * Checks if an asset with the given ID exists in the world state.
+     * @function _assetExists
+     * @param {Object} ctx - The transaction context.
+     * @param {string} assetName - The name (ID) of the asset.
+     * @returns {Promise<boolean>} A promise that resolves to true if the asset exists, otherwise false.
+     */
     async _assetExists(ctx, assetName) {
         let assetState = await ctx.stub.getState(assetName);
         return assetState && assetState.length > 0;
