@@ -33,6 +33,14 @@ class PatientContract extends Contract {
         await ctx.stub.putState(patientNameIndexKey, Buffer.from('\u0000'));
     }
 
+    async ReadAsset(ctx, id) {
+        const assetJSON = await ctx.stub.getState(id); // get the asset from chaincode state
+        if (!assetJSON || assetJSON.length === 0) {
+            throw new Error(`Asset ${id} does not exist`);
+        }
+        return assetJSON.toString();
+    }
+
     // << ==================== Intenal functions ========================== >>>
     // For internal functions... prefix them with _
 
