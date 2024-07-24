@@ -41,7 +41,7 @@ class PatientContract extends Contract {
         return assetJSON.toString();
     }
 
-    // << ==================== Intenal functions ========================== >>>
+    // << =========================================== Intenal Functions ===========================================  >>
     // For internal functions... prefix them with _
 
     /**
