@@ -34,15 +34,30 @@ class PatientContract extends Contract {
     }
 
     async ReadAsset(ctx, id) {
-        const assetJSON = await ctx.stub.getState(id); // get the asset from chaincode state
-        if (!assetJSON || assetJSON.length === 0) {
-            throw new Error(`Asset ${id} does not exist`);
-        }
-        return assetJSON.toString();
+        const assetJSON = await this._findAssetById(ctx, id);
+        return assetJSON;
     }
 
     // << =========================================== Intenal Functions ===========================================  >>
     // For internal functions... prefix them with _
+
+    /**
+     * Finds an asset by its ID in the blockchain state.
+     * @param {Context} ctx The transaction context.
+     * @param {string} assetId The ID of the asset to find.
+     * @param {boolean} [validation=false] Indicates whether to validate asset existence (default: false).
+     * @returns {Promise<Buffer>} The state of the asset retrieved from the chaincode state.
+     * @throws {Error} Throws an error if asset does not exist and validation is enabled.
+     */
+    async _findAssetById(ctx, assetId, validation = false) {
+        let assetState = await ctx.stub.getState(assetId); // get the asset from chaincode state
+        if (validation) {
+            if (!assetState || assetState.length === 0) {
+                throw new Error(`Asset ${id} does not exist`);
+            }
+        }
+        return assetState;
+    }
 
     /**
      * Checks if an asset with the given ID exists in the world state.
@@ -51,7 +66,7 @@ class PatientContract extends Contract {
      * @returns {Promise<boolean>} A promise that resolves to true if the asset exists, otherwise false.
      */
     async _assetExists(ctx, assetName) {
-        let assetState = await ctx.stub.getState(assetName);
+        let assetState = await this._findAssetById(ctx, assetName);
         return assetState && assetState.length > 0;
     }
 
