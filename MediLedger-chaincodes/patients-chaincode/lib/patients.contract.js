@@ -46,7 +46,6 @@ class PatientContract extends Contract {
 
     /**
      * Checks if an asset with the given ID exists in the world state.
-     * @function _assetExists
      * @param {Object} ctx - The transaction context.
      * @param {string} assetName - The name (ID) of the asset.
      * @returns {Promise<boolean>} A promise that resolves to true if the asset exists, otherwise false.
@@ -58,7 +57,6 @@ class PatientContract extends Contract {
 
     /**
      * Processes results from an iterator, handling either historical or current data.
-     * @function processQueryResults
      * @param {Object} iterator - An iterator providing access to the results.
      * @param {boolean} isHistory - A flag indicating if the data is historical.
      * @returns {Promise<Array<Object>>} A promise that resolves to an array of results.
