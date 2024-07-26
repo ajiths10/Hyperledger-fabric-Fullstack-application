@@ -61,8 +61,16 @@ export class PatientsService implements OnModuleInit {
         return `This action returns all patients`;
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} patient`;
+    async findOne(id: string) {
+        try {
+            console.log('\n--> Submit Transaction: ReadAsset');
+            let response = await this.Contract.evaluateTransaction('ReadAsset', id);
+            console.log('*** Evaluation Transaction successfully ***');
+            return this.responseWrapperService._successResponse('Evaluation Transaction successfully', response);
+        } catch (error) {
+            console.log(`******** FAILED to return an error ***********`, error.message);
+            return this.responseWrapperService._errorResponse(error);
+        }
     }
 
     update(id: number, updatePatientDto: UpdatePatientDto) {
