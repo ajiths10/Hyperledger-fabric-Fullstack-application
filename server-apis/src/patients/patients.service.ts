@@ -64,8 +64,9 @@ export class PatientsService implements OnModuleInit {
     async findOne(id: string) {
         try {
             console.log('\n--> Submit Transaction: ReadAsset');
-            let response = await this.Contract.evaluateTransaction('ReadAsset', id);
+            let resultBytes = await this.Contract.evaluateTransaction('ReadAsset', id);
             console.log('*** Evaluation Transaction successfully ***');
+            const response = this.utilsService._prettyJSONString(resultBytes);
             return this.responseWrapperService._successResponse('Evaluation Transaction successfully', response);
         } catch (error) {
             console.log(`******** FAILED to return an error ***********`, error.message);
