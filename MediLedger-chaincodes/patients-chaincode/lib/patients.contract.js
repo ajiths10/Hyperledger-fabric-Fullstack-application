@@ -35,7 +35,7 @@ class PatientContract extends Contract {
 
     async ReadAsset(ctx, id) {
         const assetJSON = await this._findAssetById(ctx, id);
-        return assetJSON;
+        return assetJSON.toString();
     }
 
     // << =========================================== Intenal Functions ===========================================  >>
