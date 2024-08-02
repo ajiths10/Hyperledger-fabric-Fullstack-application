@@ -66,7 +66,7 @@ export class PatientsService implements OnModuleInit {
             console.log('\n--> Submit Transaction: ReadAsset');
             let resultBytes = await this.Contract.evaluateTransaction('ReadAsset', id);
             console.log('*** Evaluation Transaction successfully ***');
-            const response = this.utilsService._prettyJSONString(resultBytes);
+            const response = this.utilsService._prettyBufferToObject(resultBytes);
             return this.responseWrapperService._successResponse('Evaluation Transaction successfully', response);
         } catch (error) {
             console.log(`******** FAILED to return an error ***********`, error.message);

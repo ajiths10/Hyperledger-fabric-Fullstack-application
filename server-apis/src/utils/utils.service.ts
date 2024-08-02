@@ -8,7 +8,7 @@ export class UtilsService {
         return process.env[key] || defaultValue;
     }
 
-    _prettyJSONString(resultBytes: AllowSharedBufferSource) {
+    _prettyBufferToObject(resultBytes: AllowSharedBufferSource) {
         try {
             const utf8Decoder = new TextDecoder();
             const resultJson = utf8Decoder.decode(resultBytes);
