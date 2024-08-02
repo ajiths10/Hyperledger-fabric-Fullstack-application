@@ -36,8 +36,9 @@ export class PatientsService implements OnModuleInit {
         try {
             console.log('\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger');
             // Initialize a set of asset data on the ledger using the chaincode 'InitPatientsLedger' function.
-            let response = await this.Contract.submitTransaction('InitPatientsLedger'); // "InitPatientsLedger" Smart Contract/Chain code Ref
+            const resultBytes = await this.Contract.submitTransaction('InitPatientsLedger'); // "InitPatientsLedger" Smart Contract/Chain code Ref
             console.log('*** Transaction committed successfully ***');
+            const response = this.utilsService._prettyBufferToObject(resultBytes);
             return this.responseWrapperService._successResponse('Transaction committed successfully', response);
         } catch (error) {
             console.log(`******** FAILED to return an error ***********`, error.message);
