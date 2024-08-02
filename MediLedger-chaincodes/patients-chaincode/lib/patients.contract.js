@@ -11,7 +11,7 @@ class PatientContract extends Contract {
     async InitPatientsLedger(ctx) {
         const message = 'Hello there, patient contract initiated!, Your good to go.';
         console.log(message);
-        return message;
+        return { message, status: true };
     }
 
     async CreateAsset(ctx, p_id, name, email, phone, dob, blood_group) {
