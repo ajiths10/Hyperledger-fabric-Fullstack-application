@@ -31,6 +31,10 @@ class PatientContract extends Contract {
         await ctx.stub.putState(p_id, Buffer.from(JSON.stringify(asset)));
         let patientNameIndexKey = await ctx.stub.createCompositeKey(indexName, [asset.name, asset.patient_id]);
         await ctx.stub.putState(patientNameIndexKey, Buffer.from('\u0000'));
+        return {
+            message: `#${p_id} Asset created successfully.`,
+            status: true,
+        };
     }
 
     async ReadAsset(ctx, id) {
