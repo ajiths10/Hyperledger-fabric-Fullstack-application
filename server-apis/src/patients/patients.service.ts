@@ -49,8 +49,9 @@ export class PatientsService implements OnModuleInit {
     async create(body: CreatePatientDto) {
         try {
             console.log('\n--> Submit Transaction: CreateAsset');
-            let response = await this.Contract.submitTransaction('CreateAsset', 'Asset_003', body.name, body.email, body.phone, body.dob, body.blood_group);
+            let resultBytes = await this.Contract.submitTransaction('CreateAsset', 'Asset_005', body.name, body.email, body.phone, body.dob, body.blood_group);
             console.log('*** Transaction committed successfully ***');
+            const response = this.utilsService._prettyBufferToObject(resultBytes);
             return this.responseWrapperService._successResponse('Transaction committed successfully: "Patient created successfully!"', response);
         } catch (error) {
             console.log(`******** FAILED to return an error ***********`, error.message);
